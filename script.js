@@ -11,7 +11,7 @@ const $btnNew = document.querySelector('.btn--new');
 const $btnRoll = document.querySelector('.btn--roll');
 const $btnHold = document.querySelector('.btn--hold');
 
-const scores = [0, 0];
+let scores = [0, 0];
 let activePlayer = 0;
 let currentScore = 0;
 
@@ -34,9 +34,50 @@ $btnRoll.addEventListener('click', () => {
         currentScore = 0;
         $activePlayer.textContent = currentScore;
 
-        activePlayer = activePlayer === 0 ? 1 : 0;
-        $players.forEach(player => {
-            player.classList.toggle('player--active');
-        });
+        switchPlayer();
     }
 });
+
+$btnHold.addEventListener('click', () => {
+    scores[activePlayer] += currentScore;
+    const $activePlayerScore = document.getElementById(`score--${activePlayer}`);
+    $activePlayerScore.textContent = scores[activePlayer];
+
+    if (scores[activePlayer] >= 100) {
+        $dice.classList.add('hidden');
+    } else {
+        switchPlayer();
+    }
+});
+
+
+// New game
+$btnNew.addEventListener('click', () => {
+    // Reset scores and state
+    scores = [0, 0];
+    currentScore = 0;
+    activePlayer = 0;
+    
+    // Update the UI
+    $score0.textContent = 0;
+    $score1.textContent = 0;
+    $current0.textContent = 0;
+    $current1.textContent = 0;
+    
+    // Hide dice
+    $dice.classList.add('hidden');
+    
+    // Reset player classes
+    $players.forEach(player => {
+        player.classList.remove('player--active');
+        player.classList.remove('player--winner');
+    });
+    $players[0].classList.add('player--active');
+});
+
+function switchPlayer() {
+    activePlayer = activePlayer === 0 ? 1 : 0;
+    $players.forEach(player => {
+        player.classList.toggle('player--active');
+    });
+}
