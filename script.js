@@ -22,37 +22,41 @@ $btnRoll.addEventListener('click', () => {
     // Display number rolled
     $dice.src = `dice-${randomNumber}.png`;
     $dice.classList.remove('hidden');
-    const $activePlayer = document.getElementById(`current--${activePlayer}`);
+    const $activePlayerCurrentScore = document.getElementById(`current--${activePlayer}`);
 
     // Check for rolled number
     if (randomNumber !== 1) {
         // Add to current score
         currentScore += randomNumber;
-        $activePlayer.textContent = currentScore;
+        $activePlayerCurrentScore.textContent = currentScore;
+        if (currentScore >= 100) {
+            gameOver($activePlayerCurrentScore);
+        }
     } else {
         // Switch to next player
-        currentScore = 0;
-        $activePlayer.textContent = currentScore;
-
-        switchPlayer();
+        switchPlayer($activePlayerCurrentScore);
     }
 });
 
 $btnHold.addEventListener('click', () => {
     scores[activePlayer] += currentScore;
-    const $activePlayerScore = document.getElementById(`score--${activePlayer}`);
-    $activePlayerScore.textContent = scores[activePlayer];
+    const $activePlayerTotalScore = document.getElementById(`score--${activePlayer}`);
+    const $activePlayerCurrentScore = document.getElementById(`current--${activePlayer}`);
+    $activePlayerTotalScore.textContent = scores[activePlayer];
 
     if (scores[activePlayer] >= 100) {
-        $dice.classList.add('hidden');
+        gameOver($activePlayerCurrentScore);
     } else {
-        switchPlayer();
+        switchPlayer($activePlayerCurrentScore);
     }
 });
 
 
 // New game
 $btnNew.addEventListener('click', () => {
+    $btnHold.classList.remove('hidden');
+    $btnRoll.classList.remove('hidden');
+
     // Reset scores and state
     scores = [0, 0];
     currentScore = 0;
@@ -75,9 +79,18 @@ $btnNew.addEventListener('click', () => {
     $players[0].classList.add('player--active');
 });
 
-function switchPlayer() {
+function switchPlayer($activePlayerCurrentScore) {
+    currentScore = 0;
+    $activePlayerCurrentScore.textContent = 0;
     activePlayer = activePlayer === 0 ? 1 : 0;
     $players.forEach(player => {
         player.classList.toggle('player--active');
     });
+}
+
+function gameOver($activePlayerCurrentScore) {
+    $dice.classList.add('hidden');
+    $activePlayerCurrentScore.closest('.player').classList.add('player--winner');
+    $btnHold.classList.add('hidden');
+    $btnRoll.classList.add('hidden');
 }
